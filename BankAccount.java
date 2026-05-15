@@ -3,13 +3,15 @@ import java.util.InputMismatchException;
 
 // 1. Custom Checked Exception Class
 // TODO: Inherit from the correct class to make this a Checked Exception.
-class InsufficientBalanceException { 
+class InsufficientBalanceException extends Exception { 
     private double balance;
     private double amount;
 
     public InsufficientBalanceException(double balance, double amount) {
         // TODO: Invoke the superclass constructor with a clear error message[cite: 289].
-        
+        super("balance error");
+        this.balance = balance;
+        this.amount = amount;
     }
 
     public double getBalance() { return balance; }
@@ -30,19 +32,27 @@ public class BankAccount {
 
     public void deposit(double amount) {
         // TODO: Validate input and throw an IllegalArgumentException if amount is <= 0[cite: 102].
-        
-        
-        balance += amount;
-        System.out.println("$" + amount + " successfully deposited.");
+ 
+        if (amount <= 0) {
+            throw new IllegalArgumentException();
+        }
+        else {
+            balance += amount;
+            System.out.println("$" + amount + " successfully deposited.");
+        }
     }
 
     // TODO: Add the proper exception declaration to the method signature[cite: 95].
-    public void withdraw(double amount) {
+    public void withdraw(double amount) throws InsufficientBalanceException {
         // TODO: Validate balance and throw your custom InsufficientBalanceException if needed[cite: 110].
-        
-        
-        balance -= amount;
-        System.out.println("$" + amount + " successfully withdrawn.");
+
+        if (amount > balance) {
+            throw new InsufficientBalanceException(balance, amount);
+        }
+        else {
+            balance -= amount;
+            System.out.println("$" + amount + " successfully withdrawn.");
+        }
     }
 
     public static void main(String[] args) {
@@ -57,17 +67,36 @@ public class BankAccount {
         // Catch InputMismatchException and IllegalArgumentException, and always display the balance[cite: 44, 151].
         System.out.print("\nEnter the amount to DEPOSIT: ");
         double depositAmount = input.nextDouble();
-        account.deposit(depositAmount);
-        
-
+        try {
+            account.deposit(depositAmount);
+        }
+        catch (IllegalArgumentException ex) {
+            System.out.println("deposit error");
+        }
+        catch (InputMismatchException ex) {
+            System.out.println("Invalid input");
+        }
+        finally {
+            System.out.println("Your account is " + account.balance);
+        }
 
         // --- WITHDRAWAL PROCESS ---
         // TODO: Wrap the withdrawal process in a try-catch-finally layout[cite: 34].
         // Catch InputMismatchException and InsufficientBalanceException, and always display the balance[cite: 44, 151].
         System.out.print("\nEnter the amount to WITHDRAW: ");
         double withdrawAmount = input.nextDouble();
-        account.withdraw(withdrawAmount);
-        
+        try {
+            account.withdraw(withdrawAmount);
+        }
+        catch (InsufficientBalanceException ex) {
+            System.out.println(ex.getMessage());
+        }
+        catch (InputMismatchException ex) {
+            System.out.println("Invalid input");
+        }
+        finally {
+            System.out.println("Your account is " + account.balance);
+        }
 
 
         System.out.println("\n=== Thank you for using our service ===");
